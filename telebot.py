@@ -4,7 +4,8 @@ from requests import request
 from bs4 import BeautifulSoup as soup
 import time
 import pickle
-
+from telegram import ParseMode
+import wget
 
 import re
 import libtorrent
@@ -54,7 +55,9 @@ try:
 
         torrent_hash = magnet_link[20:60].upper()
         torrent_download_link_= f"https://itorrents.org/torrent/{torrent_hash}.torrent"
-        torrent_response = requests.get(torrent_download_link_)
+
+
+        torrent_response = requests.get(torrent_download_link_, stream=True, headers={'User-agent': 'Mozilla/5.0'})
         open(f'torrents/{title_of_movie}.torrent',"wb").write(torrent_response.content)
         torrent_file = open(f'torrents/{title_of_movie}.torrent', 'rb')
         bot.send_document(message.from_user.id, torrent_file)
