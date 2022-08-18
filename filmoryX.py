@@ -98,7 +98,7 @@ def driver(movie_name):
     print(f"\nI found the following qualities for {movie_name}")
     print(quality_size)
     user_quality_choice = int(input(f"Enter Number of your desired quality from 1-{c-1}: "))
-    print(magnets[torrents[0][user_quality_choice-1]])
+    print(magnets[torrents[user_quality_choice-1][0]])
     #mag2tor(trimmed_movie_title_ls[user_choice-1],magnets[torrents[0][user_quality_choice-1]])
     
     
