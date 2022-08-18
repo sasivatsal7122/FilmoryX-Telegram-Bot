@@ -1,11 +1,10 @@
 import telebot
-# from telethon.sync import TelegramClient
-# from telethon.tl.types import InputPeerUser, InputPeerChannel
-# from telethon import TelegramClient, sync, events
+import requests
 from requests import request
 from bs4 import BeautifulSoup as soup
 import time
 import pickle
+
 
 import re
 import libtorrent
@@ -52,10 +51,16 @@ try:
         time.sleep(0.2)
         bot.send_message(message.chat.id,"Calculating seeds and peers....")
         bot.send_message(message.chat.id,"Here is Your Requested Magnet Link, Enjoy your movie...")
-        
-        torrent_file = open(f'torrents/{title_of_movie}.txt', 'r')
+
+        torrent_hash = magnet_link[20:60].upper()
+        torrent_download_link_= f"https://itorrents.org/torrent/{torrent_hash}.torrent"
+        torrent_response = requests.get(torrent_download_link_)
+        open(f'torrents/{title_of_movie}.torrent',"wb").write(torrent_response.content)
+        torrent_file = open(f'torrents/{title_of_movie}.torrent', 'rb')
         bot.send_document(message.from_user.id, torrent_file)
-        
+        bot.send_message(message.chat.id,"If the above torrent fails to add , paste this magnet url in your torrent client")
+        bot.send_message(message.chat.id,magnet_link)
+
       
       
       def downmovie_util_2(user_movie_choice):
