@@ -41,12 +41,12 @@ try:
             with open(f'torrents/{title_of_movie}.txt','w') as fp:
                 fp.write(magnet_link)
             
-            bot.send_message(message.chat.id,"Getting requested magnet link....")
+            bot.send_message(message.chat.id,"Getting requested torrent file....")
             time.sleep(0.2)
             bot.send_message(message.chat.id,"Obtaining Metadata...")
             time.sleep(0.2)
             bot.send_message(message.chat.id,"Calculating seeds and peers....")
-            bot.send_message(message.chat.id,"Here is Your Requested Magnet Link, Enjoy your movie...")
+            bot.send_message(message.chat.id,"Here is Your Requested torrent file, Enjoy your movie...")
 
             torrent_hash = magnet_link[20:60].upper()
             torrent_download_link_= f"https://itorrents.org/torrent/{torrent_hash}.torrent"
@@ -56,8 +56,8 @@ try:
             open(f'torrents/{title_of_movie}.torrent',"wb").write(torrent_response.content)
             torrent_file = open(f'torrents/{title_of_movie}.torrent', 'rb')
             bot.send_document(message.from_user.id, torrent_file)
-            bot.send_message(message.chat.id,"If the above torrent fails to add , paste this magnet url in your torrent client")
-            bot.send_message(message.chat.id,magnet_link)
+        #     bot.send_message(message.chat.id,"If the above torrent fails to add , paste this magnet url in your torrent client")
+        #     bot.send_message(message.chat.id,magnet_link)
         except:
             bot.send_message(message.chat.id,"You Entered Wrong Option Mate, Try Again from /Download_Movie")
 
@@ -73,24 +73,28 @@ try:
             global movie_name_to_download
             movie_name_to_download = close_results_ls[user_movie_choicee-1]
             
-            torrents,magnets = get_torrent(movie_name_to_download)
-            
-            with open('magnets.pkl', 'wb') as f:
-                pickle.dump(magnets, f)
-            with open('torrents.pkl', 'wb') as ff:
-                pickle.dump(torrents, ff)
-            
+            torrents,magnets,is_torrent_there = get_torrent(movie_name_to_download)
             quality_size="";c=1
             for ___ in torrents:
-                quality_size+=f"{c}.{___[1]} <---> {___[0]}\n"
+                quality_size+=f"{c}. {___[1]} <---> {___[0]}\n"
                 c+=1
-            
-            print_2 = f"I found the following qualities for {movie_name_to_download}"
-            bot.send_message(message.chat.id,print_2)
-            bot.send_message(message.chat.id,quality_size)
-            user_quality_choice = bot.send_message(message.chat.id,f"Enter Number of your desired quality from 1-{c-1}: ")
-        
-            bot.register_next_step_handler(user_quality_choice, downmovie_util_3)
+
+            if is_torrent_there=="Movierulz Movies Watch Online & Download" or len(quality_size)==0:
+              bot.send_message(message.chat.id,f"Sorry! I could'nt any torrent files for {movie_name_to_download}")
+            else:
+              with open('magnets.pkl', 'wb') as f:
+                  pickle.dump(magnets, f)
+              with open('torrents.pkl', 'wb') as ff:
+                  pickle.dump(torrents, ff)
+              
+              
+              
+              print_2 = f"I found the following qualities for {movie_name_to_download}"
+              bot.send_message(message.chat.id,print_2)
+              bot.send_message(message.chat.id,quality_size)
+              user_quality_choice = bot.send_message(message.chat.id,f"Enter Number of your desired quality from 1-{c-1}: ")
+          
+              bot.register_next_step_handler(user_quality_choice, downmovie_util_3)
         except:
             bot.send_message(message.chat.id,"You Entered Wrong Option Mate, Try Again from /Download_Movie")
     
@@ -137,7 +141,7 @@ try:
             bot.send_message(message.chat.id, print_1)
             
             for __ in close_results:
-                movie_name_string = f"{count}.{close_results[__]}"
+                movie_name_string = f"{count}. {close_results[__]}"
                 count+=1
                 bot.send_message(message.chat.id,str(movie_name_string))
             close_results_ls = [*close_results.values()]
@@ -145,9 +149,9 @@ try:
             with open('close_results_ls.pkl', 'wb') as f:
                 pickle.dump(close_results_ls, f)
                 
-            user_movie_choice = bot.send_message(message.chat.id,f"Enter Number of your desired movie from 1-{count-1}: ")
-            
+            user_movie_choice = bot.send_message(message.chat.id,f"Enter Number of your desired movie from 1-{count-1}: ")         
             bot.register_next_step_handler(user_movie_choice, downmovie_util_2)
+          
         except:
             bot.send_message(message.chat.id,"could'nt find movie, check for spelling mistake and try again with name and year of release of movie \n\n Eg: Pokiri 2006 or RRR 2022")
         
@@ -162,12 +166,12 @@ try:
   
   @bot.message_handler(commands=['start'])
   def welcome_message(message):
-    greet_message = """
-  Hey there! Welcome to Filmory-X Bot!
-  
-  Available Functions :
-  
-  /Download_Movie -- returns a magnet link of requested movie
+    greet_message = f"""
+Hey there {message.from_user.username}\n\nWelcome to Filmory-X Bot!
+
+Click on: 
+
+/Download_Movie -- returns a magnet link of requested movie
   
     """
     bot.send_message(message.chat.id, greet_message)
