@@ -2,13 +2,9 @@ from requests import request
 from bs4 import BeautifulSoup as soup
 
 
-def get_torrent(movie_name):
-    movie = movie_name.replace("[","")
-    movie = movie.replace("]","")
-    movie = movie.replace(" ","-")
-    base_url= "https://ww5.7movierulz.tc/"
-    url = base_url+movie
-    response = request('GET',url)
+def get_torrent(movie_url):
+    
+    response = request('GET',movie_url)
     
     html_page_soup = soup(response.text, "html.parser")
     container = html_page_soup.findAll("a", {"class": "mv_button_css"})
